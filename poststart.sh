@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
 # copy example notebooks
-if [ ! -d notebooks ]; then
-    git clone https://github.com/cellgeni/notebooks /tmp/git-notebooks
-    cp -Rf /tmp/git-notebooks/files/. .
-    rm -rf /tmp/git-notebooks
-fi
+TMP_NOTEBOOKS=/tmp/example-notebooks.zip
+wget --quiet -O $TMP_NOTEBOOKS https://github.com/cellgeni/notebooks/archive/master.zip 
+unzip $TMP_NOTEBOOKS -d /tmp
+rm /tmp/notebooks-master/.gitignore /tmp/notebooks-master/LICENSE /tmp/notebooks-master/README.md
+cp -Rf /tmp/notebooks-master/. .
+rm -rf $TMP_NOTEBOOKS /tmp/notebooks-master/
+
 
 # copy default run commands but provide a way for users to keep their own config
 if [ ! -f .keep-local-conf ]; then
@@ -13,11 +15,24 @@ if [ ! -f .keep-local-conf ]; then
     cp /config/.condarc /home/jovyan/
     # .Rprofile: set binary package repo
     cp /config/.Rprofile /home/jovyan/
-    # .bash_profile: make login shells source .bashrc
-    echo "source ~/.bashrc" > .bash_profile
-    # .bashrc: activate myenv by default
-    echo "source activate myenv" > .bashrc
 fi
+
+
+# .bashrc: activate myenv by default
+if [ ! -f .bashrc ]; then
+    echo 'source activate myenv' > .bashrc
+else
+    grep -qF 'source activate myenv' .bashrc || echo 'source activate myenv' >> .bashrc
+fi
+
+
+# .bash_profile: make login shells source .bashrc
+if [ ! -f .bash_profile ]; then
+    echo "source ~/.bashrc" > .bash_profile
+else
+    grep -qF 'source ~/.bashrc' .bash_profile || echo 'source ~/.bashrc' >> .bash_profile
+fi
+
 
 # create default environment 'myenv'
 if [ ! -d my-conda-envs/myenv ]; then
@@ -25,9 +40,11 @@ if [ ! -d my-conda-envs/myenv ]; then
     source activate myenv
 fi
 
+
 Rscript -e 'dir.create(path = Sys.getenv("R_LIBS_USER"), showWarnings = FALSE, recursive = TRUE)'
 Rscript -e '.libPaths( c( Sys.getenv("R_LIBS_USER"), .libPaths() ) )'
 Rscript -e 'IRkernel::installspec()'
+
 
 # create matching folders to mount the farm
 if [ ! -d /nfs ] || [ ! -d /lustre ] || [ ! -d /warehouse ]; then
@@ -35,6 +52,7 @@ if [ ! -d /nfs ] || [ ! -d /lustre ] || [ ! -d /warehouse ]; then
     sudo mkdir -p /lustre
     sudo mkdir -p /warehouse
 fi
+
 
 # set env vars for nbresuse limits
 export MEM_LIMIT=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
