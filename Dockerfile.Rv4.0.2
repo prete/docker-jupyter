@@ -4,7 +4,7 @@ USER root
 
 # GENERAL PACKAGES
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    gnupg2 \
+    software-properties-common gnupg2 lsb-release  \
     # stuff for R users
     libgsl0-dev libxml2-dev libboost-all-dev libssl-dev libhdf5-dev unzip curl libudunits2-dev libgdal-dev libgeos-dev libproj-dev \
     build-essential xorg-dev libreadline-dev libc6-dev zlib1g-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libcairo2-dev libpango1.0-dev tcl-dev tk-dev openjdk-8-jdk openjdk-8-jre gfortran \
