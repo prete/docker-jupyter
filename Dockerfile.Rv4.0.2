@@ -4,7 +4,9 @@ USER root
 
 # GENERAL PACKAGES
 RUN apt-get update && apt-get install -yq --no-install-recommends \
+    gnupg2 \
     # stuff for R users
+    libgsl0-dev libxml2-dev libboost-all-dev libssl-dev libhdf5-dev unzip curl libudunits2-dev libgdal-dev libgeos-dev libproj-dev \
     build-essential xorg-dev libreadline-dev libc6-dev zlib1g-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libcairo2-dev libpango1.0-dev tcl-dev tk-dev openjdk-8-jdk openjdk-8-jre gfortran \
     # sshfs dependencies
     fuse libfuse2 sshfs && \
@@ -41,9 +43,6 @@ RUN pip install --no-cache-dir \
         https://github.com/yuvipanda/nbrsessionproxy/archive/rserver-again.zip && \
     jupyter serverextension enable --sys-prefix jupyter_server_proxy
 
-# R package dependencies
-RUN apt-get -y install \
-    libgsl0-dev libxml2-dev libboost-all-dev libssl-dev libhdf5-dev unzip curl libudunits2-dev libgdal-dev libgeos-dev libproj-dev
 
 # Use this URL to work with the binary packages available as of October 29, 2020 for Ubuntu 20.04 (Focal)
 # https://packagemanager.rstudio.com/client/#/repos/1/overview
