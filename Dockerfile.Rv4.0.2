@@ -1,0 +1,77 @@
+FROM jupyter/base-notebook
+
+USER root
+
+# GENERAL PACKAGES
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+    # stuff for R users
+    build-essential xorg-dev libreadline-dev libc6-dev zlib1g-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libcairo2-dev libpango1.0-dev tcl-dev tk-dev openjdk-8-jdk openjdk-8-jre gfortran \
+    # sshfs dependencies
+    fuse libfuse2 sshfs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# install R
+# https://cran.r-project.org/bin/linux/ubuntu/README.html
+RUN R_VERSION=cran40 && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
+    echo "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -c | awk '{print $2}')-$R_VERSION/" | sudo tee -a /etc/apt/sources.list && \
+    add-apt-repository ppa:c2d4u.team/c2d4u4.0+ && \
+    apt-get update && apt-get install -yq --no-install-recommends \
+        r-base \
+        r-base-dev \
+    && apt-get clean \
+    && rm -rf /tmp/downloaded_packages/ /tmp/*.rds \
+    rm -rf /var/lib/apt/lists/*
+
+# install RStudio
+RUN RSTUDIO_PKG=rstudio-server-1.2.5019-amd64.deb && \
+    cd /tmp && \
+    wget -q https://download2.rstudio.org/server/bionic/amd64/${RSTUDIO_PKG} && \
+    apt-get install /tmp/${RSTUDIO_PKG} && \
+    rm /tmp/${RSTUDIO_PKG}
+
+# add RStudio to PATH
+ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
+
+# Install jupyter-server-proxy extension and 
+# jupyter-rsession-proxy (nbrsessionproxy from yuvipanda)
+RUN pip install --no-cache-dir \
+        jupyter-server-proxy \
+        https://github.com/yuvipanda/nbrsessionproxy/archive/rserver-again.zip && \
+    jupyter serverextension enable --sys-prefix jupyter_server_proxy
+
+# R package dependencies
+RUN apt-get -y install \
+    libgsl0-dev libxml2-dev libboost-all-dev libssl-dev libhdf5-dev unzip curl libudunits2-dev libgdal-dev libgeos-dev libproj-dev
+
+# Use this URL to work with the binary packages available as of October 29, 2020 for Ubuntu 20.04 (Focal)
+# https://packagemanager.rstudio.com/client/#/repos/1/overview
+RUN echo 'options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/__linux__/focal/356"))' > ~/.Rprofile
+
+# install R packages
+RUN Rscript -e 'install.packages(c("rJava", "umap", "ggplot2", "ggfortify", "Rmagic", "BiocManager", "devtools", "lsa", "uwot", "optparse"), dependencies = TRUE)'
+
+# PYTHON
+RUN pip --no-cache install --upgrade ipykernel rpy2 && \
+    conda install nb_conda_kernels 
+
+# Fix permissions
+RUN fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER 
+
+# Install rclone
+RUN cd /tmp && \
+    wget https://downloads.rclone.org/rclone-current-linux-amd64.deb && \
+    apt-get install -y /tmp/rclone-current-linux-amd64.deb && \
+    rm /tmp/rclone-current-linux-amd64.deb
+
+# Give jovyan sudo permissions
+RUN sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoers && \
+    echo "jovyan ALL= (ALL) NOPASSWD: ALL" >> /etc/sudoers.d/jovyan
+
+# Copy mount script
+COPY mount-farm /usr/local/bin/mount-farm
+RUN chmod +x /usr/local/bin/mount-farm
+
+COPY poststart.sh /poststart.sh
