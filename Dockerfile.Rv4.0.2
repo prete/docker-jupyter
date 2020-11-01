@@ -3,14 +3,25 @@ FROM jupyter/base-notebook
 USER root
 
 # GENERAL PACKAGES
-RUN apt-get update && apt-get install -yq --no-install-recommends \
-    software-properties-common gnupg2 lsb-release  \
-    # stuff for R users
+RUN apt-get update -y -qq && apt-get install -y -qq --no-install-recommends \
+    apt-utils software-properties-common gnupg2 lsb-release
+
+# stuff for R packages
+RUN apt-get install -y -qq --no-install-recommends \
     libgsl0-dev libxml2-dev libboost-all-dev libssl-dev libhdf5-dev unzip curl libudunits2-dev libgdal-dev libgeos-dev libproj-dev \
-    build-essential xorg-dev libreadline-dev libc6-dev zlib1g-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libcairo2-dev libpango1.0-dev tcl-dev tk-dev openjdk-8-jdk openjdk-8-jre gfortran \
-    # sshfs dependencies
-    fuse libfuse2 sshfs && \
-    apt-get clean && \
+    build-essential xorg-dev libreadline-dev libc6-dev libclang-8-dev zlib1g-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libcairo2-dev \
+    libpango1.0-dev tcl-dev tk-dev openjdk-8-jdk openjdk-8-jre gfortran
+
+# stuff for RStudio
+RUN apt-get install -y -qq --no-install-recommends \
+    gdebi-core ant   build-essential   clang   cmake   debsigs   dpkg-sig   expect   fakeroot   gnupg1   libacl1-dev   libattr1-dev   libbz2-dev   libcap-dev   libclang-6.0-dev   libclang-dev   libcurl4-openssl-dev   libegl1-mesa   libfuse2   libgl1-mesa-dev   libgtk-3-0   libpam-dev   libpango1.0-dev   libpq-dev   libsqlite3-dev   libssl-dev   libuser1-dev   libxslt1-dev   lsof   ninja-build   patchelf   pkg-config  psmisc  python   rrdtool   software-properties-common   unzip   uuid-dev   wget   zlib1g-dev
+    
+# sshfs dependencies
+RUN apt-get install -y -qq --no-install-recommends \
+    fuse libfuse2 sshfs s3fs
+
+# clean up
+RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # install R
@@ -27,10 +38,10 @@ RUN R_VERSION=cran40 && \
     rm -rf /var/lib/apt/lists/*
 
 # install RStudio
-RUN RSTUDIO_PKG=rstudio-server-1.2.5019-amd64.deb && \
+RUN RSTUDIO_PKG=rstudio-server-1.3.1093-amd64.deb && \
     cd /tmp && \
     wget -q https://download2.rstudio.org/server/bionic/amd64/${RSTUDIO_PKG} && \
-    apt-get install /tmp/${RSTUDIO_PKG} && \
+    gdebi /tmp/${RSTUDIO_PKG} && \
     rm /tmp/${RSTUDIO_PKG}
 
 # add RStudio to PATH
@@ -50,6 +61,7 @@ RUN echo 'options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/
 
 # install R packages
 RUN Rscript -e 'install.packages(c("rJava", "umap", "ggplot2", "ggfortify", "Rmagic", "BiocManager", "devtools", "lsa", "uwot", "optparse"), dependencies = TRUE)'
+RUN Rscript -e 'BiocManager::install(version = "3.12")' 
 
 # PYTHON
 RUN pip --no-cache install --upgrade ipykernel rpy2 && \
@@ -73,4 +85,4 @@ RUN sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoe
 COPY mount-farm /usr/local/bin/mount-farm
 RUN chmod +x /usr/local/bin/mount-farm
 
-COPY poststart.sh /poststart.sh
+COPY poststart.r.sh /poststart/r.sh
