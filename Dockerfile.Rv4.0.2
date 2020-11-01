@@ -51,17 +51,20 @@ ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
 # jupyter-rsession-proxy (nbrsessionproxy from yuvipanda)
 RUN pip install --no-cache-dir \
         jupyter-server-proxy \
-        https://github.com/yuvipanda/nbrsessionproxy/archive/rserver-again.zip && \
-    jupyter serverextension enable --sys-prefix jupyter_server_proxy
+        jupyter-rsession-proxy && \
+    jupyter labextension install @jupyterlab/server-proxy
 
+# old config for server-proxy and rsession-proxy
+# https://github.com/yuvipanda/nbrsessionproxy/archive/rserver-again.zip && \
+#  jupyter serverextension enable --sys-prefix jupyter_server_proxy
 
 # Use this URL to work with the binary packages available as of October 29, 2020 for Ubuntu 20.04 (Focal)
 # https://packagemanager.rstudio.com/client/#/repos/1/overview
 RUN echo 'options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/__linux__/focal/356"))' > ~/.Rprofile
 
 # install R packages
-RUN Rscript -e 'install.packages(c("rJava", "umap", "ggplot2", "ggfortify", "Rmagic", "BiocManager", "devtools", "lsa", "uwot", "optparse"), dependencies = TRUE)'
-RUN Rscript -e 'BiocManager::install(version = "3.12")' 
+RUN Rscript -e 'install.packages(c("tidyverse", "rJava", "umap", "ggplot2", "ggfortify", "igraph", "Rmagic", "BiocManager", "devtools", "lsa", "uwot", "optparse", "Seurat"), dependencies = TRUE)'
+RUN Rscript -e 'BiocManager::install()' 
 
 # PYTHON
 RUN pip --no-cache install --upgrade ipykernel rpy2 && \
