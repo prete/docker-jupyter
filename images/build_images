@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+DOCKERFILE_ROOT_DIR=/home/ubuntu/docker-jupyter/images
+
+cd $DOCKERFILE_ROOT_DIR/base
+docker build -t quay.io/prete/docker-jupyter:base .
+
+cd $DOCKERFILE_ROOT_DIR/r/r-4.0.2
+docker build -t quay.io/prete/docker-jupyter:r-4.0.2 .
+
+cd $DOCKERFILE_ROOT_DIR/teichlab
+docker build -t quay.io/prete/docker-jupyter:teichlab .
+

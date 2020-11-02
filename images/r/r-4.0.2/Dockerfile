@@ -1,24 +1,19 @@
-FROM jupyter/base-notebook
+FROM quay.io/prete/docker-jupyter:base
 
 USER root
 
-# GENERAL PACKAGES
-RUN apt-get update -y -qq && apt-get install -y -qq --no-install-recommends \
-    apt-utils software-properties-common gnupg2 lsb-release
+# general OS packages
+RUN apt-get update -y -qq 
 
-# stuff for R packages
+# R dependecies
 RUN apt-get install -y -qq --no-install-recommends \
     libgsl0-dev libxml2-dev libboost-all-dev libssl-dev libhdf5-dev unzip curl libudunits2-dev libgdal-dev libgeos-dev libproj-dev \
     build-essential xorg-dev libreadline-dev libc6-dev libclang-8-dev zlib1g-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libcairo2-dev \
     libpango1.0-dev tcl-dev tk-dev openjdk-8-jdk openjdk-8-jre gfortran
 
-# stuff for RStudio
+# RStudio dependencies
 RUN apt-get install -y -qq --no-install-recommends \
     gdebi-core ant   build-essential   clang   cmake   debsigs   dpkg-sig   expect   fakeroot   gnupg1   libacl1-dev   libattr1-dev   libbz2-dev   libcap-dev   libclang-6.0-dev   libclang-dev   libcurl4-openssl-dev   libegl1-mesa   libfuse2   libgl1-mesa-dev   libgtk-3-0   libpam-dev   libpango1.0-dev   libpq-dev   libsqlite3-dev   libssl-dev   libuser1-dev   libxslt1-dev   lsof   ninja-build   patchelf   pkg-config  psmisc  python   rrdtool   software-properties-common   unzip   uuid-dev   wget   zlib1g-dev
-    
-# sshfs dependencies
-RUN apt-get install -y -qq --no-install-recommends \
-    fuse libfuse2 sshfs s3fs
 
 # clean up
 RUN apt-get clean && \
@@ -47,46 +42,29 @@ RUN RSTUDIO_PKG=rstudio-server-1.3.1093-amd64.deb && \
 # add RStudio to PATH
 ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
 
-# Install jupyter-server-proxy extension and 
-# jupyter-rsession-proxy (nbrsessionproxy from yuvipanda)
+# jupyter-server-proxy and jupyter-rsession-proxy
 RUN pip install --no-cache-dir \
         jupyter-server-proxy \
         jupyter-rsession-proxy && \
     jupyter labextension install @jupyterlab/server-proxy
 
-# old config for server-proxy and rsession-proxy
-# https://github.com/yuvipanda/nbrsessionproxy/archive/rserver-again.zip && \
-#  jupyter serverextension enable --sys-prefix jupyter_server_proxy
-
 # Use this URL to work with the binary packages available as of October 29, 2020 for Ubuntu 20.04 (Focal)
 # https://packagemanager.rstudio.com/client/#/repos/1/overview
 RUN echo 'options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/__linux__/focal/356"))' > ~/.Rprofile
 
-# install R packages
+# R packages
 RUN Rscript -e 'install.packages(c("IRkernel", "tidyverse", "rJava", "umap", "ggplot2", "ggfortify", "igraph", "Rmagic", "BiocManager", "devtools", "lsa", "uwot", "optparse", "Seurat"), dependencies = TRUE)'
 RUN Rscript -e 'IRkernel::installspec(prefix="/opt/conda")'
 RUN Rscript -e 'BiocManager::install()'
 
-# PYTHON
-RUN pip --no-cache install --upgrade ipykernel rpy2 && \
-    conda install nb_conda_kernels 
+# pip packages
+RUN pip --no-cache install --upgrade ipykernel rpy2i
 
-# Fix permissions
+# conda packages
+RUN conda install nb_conda_kernels 
+
+# fix permissions
 RUN fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER 
 
-# Install rclone
-RUN cd /tmp && \
-    wget https://downloads.rclone.org/rclone-current-linux-amd64.deb && \
-    apt-get install -y /tmp/rclone-current-linux-amd64.deb && \
-    rm /tmp/rclone-current-linux-amd64.deb
-
-# Give jovyan sudo permissions
-RUN sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoers && \
-    echo "jovyan ALL= (ALL) NOPASSWD: ALL" >> /etc/sudoers.d/jovyan
-
-# Copy mount script
-COPY mount-farm /usr/local/bin/mount-farm
-RUN chmod +x /usr/local/bin/mount-farm
-
-COPY poststart.r.sh /poststart/r.sh
+COPY poststart.sh /poststart/r.sh
