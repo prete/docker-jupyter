@@ -1,3 +1,5 @@
+numpy
+Cython
 python-igraph
 louvain
 leidenalg

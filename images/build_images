@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 
 DOCKERFILE_ROOT_DIR=/home/ubuntu/docker-jupyter/images
+REGISTRY_NAME=quay.io/prete/docker-jupyter
 
-cd $DOCKERFILE_ROOT_DIR/base
-docker build -t quay.io/prete/docker-jupyter:base .
-
-cd $DOCKERFILE_ROOT_DIR/r/r-4.0.2
-docker build -t quay.io/prete/docker-jupyter:r-4.0.2 .
-
-cd $DOCKERFILE_ROOT_DIR/teichlab
-docker build -t quay.io/prete/docker-jupyter:teichlab .
-
+for TAG_NAME in "base" "r-4.0.2" "teichlab"
+do
+    cd $DOCKERFILE_ROOT_DIR/$TAG_NAME
+    echo "🐳 Building $TAG_NAME"
+    docker build -t "$REGISTRY_NAME:$TAG_NAME" . 2> $TAG_NAME.log.txt
+    RESULT=$?
+    if [ $RESULT -eq 0 ]; then
+      echo "✅ $TAG_NAME build successfully!"
+    else
+      echo "⚠️  $TAG_NAME build failed!"
+    fi
+done

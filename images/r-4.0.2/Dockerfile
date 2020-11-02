@@ -36,7 +36,7 @@ RUN R_VERSION=cran40 && \
 RUN RSTUDIO_PKG=rstudio-server-1.3.1093-amd64.deb && \
     cd /tmp && \
     wget -q https://download2.rstudio.org/server/bionic/amd64/${RSTUDIO_PKG} && \
-    gdebi /tmp/${RSTUDIO_PKG} && \
+    gdebi --non-interactive /tmp/${RSTUDIO_PKG} && \
     rm /tmp/${RSTUDIO_PKG}
 
 # add RStudio to PATH
@@ -58,7 +58,8 @@ RUN Rscript -e 'IRkernel::installspec(prefix="/opt/conda")'
 RUN Rscript -e 'BiocManager::install()'
 
 # pip packages
-RUN pip --no-cache install --upgrade ipykernel rpy2i
+RUN pip --no-cache install --upgrade \
+      rpy2
 
 # conda packages
 RUN conda install nb_conda_kernels 
@@ -68,3 +69,5 @@ RUN fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER 
 
 COPY poststart.sh /poststart/r.sh
+RUN ln -snf /poststart.sh /poststart/r.sh
+

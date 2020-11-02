@@ -4,9 +4,12 @@ USER root
 
 # general OS packages
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    htop vim uzip \
+    htop vim unzip git wget \
     # sshfs dependencies
-    fuse libfuse2 sshfs && \
+    fuse libfuse2 sshfs \
+    # build dependencies for singularity
+    build-essential uuid-dev libgpgme-dev squashfs-tools libseccomp-dev \
+    pkg-config gcc g++ cryptsetup-bin && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -16,18 +19,45 @@ RUN pip install --no-cache-dir \
     jupyter serverextension enable --sys-prefix jupyter_server_proxy
 
 # pip packages
-RUN pip --no-cache install --upgrade ipykernel && \
-    conda install nb_conda_kernels
+RUN pip --no-cache install --upgrade \
+      nbresuse \
+      ipykernel
+
+# conda packages
+RUN conda install -c conda-forge \
+      nb_conda_kernels \
+      mamba
 
 # fix permissions
 RUN fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER 
 
 # rclone
-RUN cd /tmp && \
-    wget https://downloads.rclone.org/rclone-current-linux-amd64.deb && \
-    apt-get install -y /tmp/rclone-current-linux-amd64.deb && \
-    rm /tmp/rclone-current-linux-amd64.deb
+RUN RCLONE_DEB=rclone-current-linux-amd64.deb && \
+    cd /tmp && \
+    wget --quiet https://downloads.rclone.org/$RCLONE_DEB && \
+    apt-get install -y /tmp/$RCLONE_DEB && \
+    rm /tmp/$RCLONE_DEB
+
+# go
+RUN export VERSION=1.15 OS=linux ARCH=amd64 && \
+    cd /tmp && \
+    wget --quiet https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
+    tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz && \
+    rm go$VERSION.$OS-$ARCH.tar.gz
+
+ENV PATH=/usr/local/go/bin:$PATH
+
+# singularity
+RUN export VERSION=3.6.1 && \
+    cd /tmp && \
+    wget --quiet https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
+    tar -xzf singularity-${VERSION}.tar.gz && \
+    rm singularity-${VERSION}.tar.gz && \
+    cd /tmp/singularity && \
+    ./mconfig && make -C builddir && make -C builddir install && \
+    rm -rf /tmp/singularity/
+
 
 # give jovyan sudo permissions
 RUN sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoers && \
