@@ -13,20 +13,19 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# jupyter-server-proxy
-RUN pip install --no-cache-dir \
-        jupyter-server-proxy && \
-    jupyter serverextension enable --sys-prefix jupyter_server_proxy
-
-# pip packages
-RUN pip --no-cache install --upgrade \
-      nbresuse \
-      ipykernel
-
 # conda packages
-RUN conda install -c conda-forge \
+RUN conda install -c conda-forge mamba
+RUN mamba install -y \
       nb_conda_kernels \
-      mamba
+      jupyter-server-proxy \
+      nbresuse \ 
+      qtconsole \
+      ipywidgets \
+      ipykernel \
+      -c conda-forge
+RUN jupyter serverextension enable --sys-prefix jupyter_server_proxy 
+# && \
+#    jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 # fix permissions
 RUN fix-permissions $CONDA_DIR && \

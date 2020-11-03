@@ -43,10 +43,8 @@ RUN RSTUDIO_PKG=rstudio-server-1.3.1093-amd64.deb && \
 ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
 
 # jupyter-server-proxy and jupyter-rsession-proxy
-RUN pip install --no-cache-dir \
-        jupyter-server-proxy \
-        jupyter-rsession-proxy && \
-    jupyter labextension install @jupyterlab/server-proxy
+RUN mamba install rpy2 jupyter-rsession-proxy
+#RUN jupyter labextension install @jupyterlab/server-proxy
 
 # Use this URL to work with the binary packages available as of October 29, 2020 for Ubuntu 20.04 (Focal)
 # https://packagemanager.rstudio.com/client/#/repos/1/overview
@@ -57,17 +55,8 @@ RUN Rscript -e 'install.packages(c("IRkernel", "tidyverse", "rJava", "umap", "gg
 RUN Rscript -e 'IRkernel::installspec(prefix="/opt/conda")'
 RUN Rscript -e 'BiocManager::install()'
 
-# pip packages
-RUN pip --no-cache install --upgrade \
-      rpy2
-
-# conda packages
-RUN conda install nb_conda_kernels 
-
 # fix permissions
 RUN fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER 
 
 COPY poststart.sh /poststart/r.sh
-RUN ln -snf /poststart.sh /poststart/r.sh
-

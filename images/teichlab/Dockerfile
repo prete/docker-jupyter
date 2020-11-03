@@ -14,8 +14,8 @@ RUN apt-get clean && \
 
 # conda packages
 COPY environment.yml /tmp/environment.yml
-RUN conda env update --file /tmp/environment.yml \
-    && /opt/conda/condabin/conda clean --all --yes --quiet
+RUN mamba env create  --file /tmp/environment.yml 
+#    && /opt/conda/condabin/conda clean --all --yes --quiet
 ENV PATH /opt/conda/envs/teichlab/bin:/opt/conda/bin:$PATH
 
 # R packages
@@ -26,5 +26,5 @@ RUN Rscript -e 'install.packages(c("tidyverse","devtools","Seurat","vcfR","igrap
 RUN fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER 
 
-COPY poststart.sh /poststart/teichman.sh
+COPY poststart.sh /poststart/teichlab.sh
 
