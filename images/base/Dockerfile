@@ -23,7 +23,9 @@ RUN mamba install -y \
       ipywidgets \
       ipykernel \
       -c conda-forge
-RUN jupyter serverextension enable --sys-prefix jupyter_server_proxy 
+#RUN jupyter serverextension enable --sys-prefix jupyter_server_proxy 
+RUN jupyter labextension install @jupyterlab/server-proxy
+
 # && \
 #    jupyter labextension install @jupyter-widgets/jupyterlab-manager
 

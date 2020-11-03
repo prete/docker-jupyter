@@ -3,11 +3,12 @@
 DOCKERFILE_ROOT_DIR=/home/ubuntu/docker-jupyter/images
 REGISTRY_NAME=quay.io/prete/docker-jupyter
 
-for TAG_NAME in "base" "r-4.0.2" "teichlab"
+for TAG_NAME in "base" "julia" "r"
+#     	"teichlab"
 do
     cd $DOCKERFILE_ROOT_DIR/$TAG_NAME
     echo "🐳 Building $TAG_NAME"
-    docker build -t "$REGISTRY_NAME:$TAG_NAME" . 2> $TAG_NAME.log.txt
+    docker build -t "$REGISTRY_NAME:$TAG_NAME" .
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
       echo "✅ $TAG_NAME build successfully!"

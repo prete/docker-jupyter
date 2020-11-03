@@ -33,30 +33,33 @@ RUN R_VERSION=cran40 && \
     rm -rf /var/lib/apt/lists/*
 
 # install RStudio
-RUN RSTUDIO_PKG=rstudio-server-1.3.1093-amd64.deb && \
+RUN RSTUDIO_VERSION=1.2.5019 \
+    RSTUDIO_PKG=rstudio-server-${RSTUDIO_VERSION}-amd64.deb && \
     cd /tmp && \
     wget -q https://download2.rstudio.org/server/bionic/amd64/${RSTUDIO_PKG} && \
-    gdebi --non-interactive /tmp/${RSTUDIO_PKG} && \
+    gdebi -n /tmp/${RSTUDIO_PKG} && \
     rm /tmp/${RSTUDIO_PKG}
-
-# add RStudio to PATH
 ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
+ENV LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
+    
 
-# jupyter-server-proxy and jupyter-rsession-proxy
-RUN mamba install rpy2 jupyter-rsession-proxy
+# pip packages
+RUN pip install --upgrade --no-cache \
+      jupyter-rsession-proxy \ 
+      rpy2
+
 #RUN jupyter labextension install @jupyterlab/server-proxy
 
-# Use this URL to work with the binary packages available as of October 29, 2020 for Ubuntu 20.04 (Focal)
+# Use this URL to work with the binary packages available 
 # https://packagemanager.rstudio.com/client/#/repos/1/overview
-RUN echo 'options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/__linux__/focal/356"))' > ~/.Rprofile
+RUN echo 'options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/__linux__/focal/latest"))' > ~/.Rprofile
 
-# R packages
-RUN Rscript -e 'install.packages(c("IRkernel", "tidyverse", "rJava", "umap", "ggplot2", "ggfortify", "igraph", "Rmagic", "BiocManager", "devtools", "lsa", "uwot", "optparse", "Seurat"), dependencies = TRUE)'
-RUN Rscript -e 'IRkernel::installspec(prefix="/opt/conda")'
-RUN Rscript -e 'BiocManager::install()'
+## R packages
+#RUN Rscript -e 'install.packages(c("IRkernel", "tidyverse", "rJava", "umap", "ggplot2", "ggfortify", "igraph", "Rmagic", "BiocManager", "devtools", "lsa", "uwot", "optparse", "Seurat"), dependencies = TRUE)'
+#RUN Rscript -e 'IRkernel::installspec(prefix="/opt/conda")'
+#RUN Rscript -e 'BiocManager::install()'
 
 # fix permissions
-RUN fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER 
+RUN fix-permissions $CONDA_DIR
 
 COPY poststart.sh /poststart/r.sh

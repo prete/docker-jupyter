@@ -1,4 +1,4 @@
-FROM quay.io/prete/docker-jupyter:r-4.0.2
+FROM quay.io/prete/docker-jupyter:r
 
 USER root
 
