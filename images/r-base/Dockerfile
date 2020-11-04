@@ -1,5 +1,8 @@
 FROM quay.io/prete/docker-jupyter:base
 
+ARG rstudio_version="1.2.5019"
+
+
 USER root
 
 # general OS packages
@@ -9,9 +12,10 @@ RUN apt-get update -y -qq
 RUN apt-get install -y -qq --no-install-recommends \
     libgsl0-dev libxml2-dev libboost-all-dev libssl-dev libhdf5-dev unzip curl libudunits2-dev libgdal-dev libgeos-dev libproj-dev \
     build-essential xorg-dev libreadline-dev libc6-dev libclang-8-dev zlib1g-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libcairo2-dev \
-    libpango1.0-dev tcl-dev tk-dev openjdk-8-jdk openjdk-8-jre gfortran
+    libpango1.0-dev tcl-dev tk-dev openjdk-8-jdk gfortran
 
 # RStudio dependencies
+# https://github.com/rstudio/rstudio/tree/master/dependencies/linux
 RUN apt-get install -y -qq --no-install-recommends \
     gdebi-core ant   build-essential   clang   cmake   debsigs   dpkg-sig   expect   fakeroot   gnupg1   libacl1-dev   libattr1-dev   libbz2-dev   libcap-dev   libclang-6.0-dev   libclang-dev   libcurl4-openssl-dev   libegl1-mesa   libfuse2   libgl1-mesa-dev   libgtk-3-0   libpam-dev   libpango1.0-dev   libpq-dev   libsqlite3-dev   libssl-dev   libuser1-dev   libxslt1-dev   lsof   ninja-build   patchelf   pkg-config  psmisc  python   rrdtool   software-properties-common   unzip   uuid-dev   wget   zlib1g-dev
 
@@ -33,33 +37,33 @@ RUN R_VERSION=cran40 && \
     rm -rf /var/lib/apt/lists/*
 
 # install RStudio
-RUN RSTUDIO_VERSION=1.2.5019 \
-    RSTUDIO_PKG=rstudio-server-${RSTUDIO_VERSION}-amd64.deb && \
+RUN RSTUDIO_PKG=rstudio-server-${rstudio_version}-amd64.deb && \
     cd /tmp && \
     wget -q https://download2.rstudio.org/server/bionic/amd64/${RSTUDIO_PKG} && \
     gdebi -n /tmp/${RSTUDIO_PKG} && \
     rm /tmp/${RSTUDIO_PKG}
 ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
-ENV LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
-    
+ENV LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server"
+
 
 # pip packages
 RUN pip install --upgrade --no-cache \
       jupyter-rsession-proxy \ 
       rpy2
 
-#RUN jupyter labextension install @jupyterlab/server-proxy
-
 # Use this URL to work with the binary packages available 
 # https://packagemanager.rstudio.com/client/#/repos/1/overview
+RUN echo 'local({ options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/__linux__/focal/latest")) })' > $R_HOME/etc/Rprofile.site
 RUN echo 'options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/__linux__/focal/latest"))' > ~/.Rprofile
 
 ## R packages
-#RUN Rscript -e 'install.packages(c("IRkernel", "tidyverse", "rJava", "umap", "ggplot2", "ggfortify", "igraph", "Rmagic", "BiocManager", "devtools", "lsa", "uwot", "optparse", "Seurat"), dependencies = TRUE)'
-#RUN Rscript -e 'IRkernel::installspec(prefix="/opt/conda")'
-#RUN Rscript -e 'BiocManager::install()'
+RUN Rscript -e 'install.packages(c("IRkernel", "Rmagic", "BiocManager", "devtools"), dependencies = TRUE)'
+RUN Rscript -e 'IRkernel::installspec(prefix="/opt/conda")'
+RUN Rscript -e 'BiocManager::install()'
 
 # fix permissions
-RUN fix-permissions $CONDA_DIR
+RUN fix-permissions /opt/conda/share/jupyter/kernels/ && \
+    fix-permissions /usr/lib/R/ && \
+    fix-permissions /usr/local/lib/R/site-library
 
 COPY poststart.sh /poststart/r.sh

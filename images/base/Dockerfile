@@ -4,12 +4,14 @@ USER root
 
 # general OS packages
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    htop vim unzip git wget \
+    htop vim unzip git wget tmux \
     # sshfs dependencies
     fuse libfuse2 sshfs \
     # build dependencies for singularity
     build-essential uuid-dev libgpgme-dev squashfs-tools libseccomp-dev \
-    pkg-config gcc g++ cryptsetup-bin && \
+    pkg-config gcc g++ cryptsetup-bin \
+    # base dependencies for general stuff
+    libhdf5-dev hdf5-tools libigraph0-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
