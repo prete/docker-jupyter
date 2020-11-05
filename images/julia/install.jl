@@ -1,4 +1,6 @@
 using Pkg;
+Pkg.update();
+Pkg.add("IJulia");
 Pkg.add("Gadfly");
 Pkg.add("RDatasets");
 Pkg.add("Distances");
