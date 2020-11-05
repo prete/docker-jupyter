@@ -16,7 +16,6 @@ WORKDIR /tmp
 
 RUN mkdir "/opt/julia-${JULIA_VERSION}" && \
     wget -q https://julialang-s3.julialang.org/bin/linux/x64/$(echo "${JULIA_VERSION}" | cut -d. -f 1,2)"/julia-${JULIA_VERSION}-linux-x86_64.tar.gz" && \
-    echo "${julia_checksum} *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
     tar xzf "julia-${JULIA_VERSION}-linux-x86_64.tar.gz" -C "/opt/julia-${JULIA_VERSION}" --strip-components=1 && \
     rm "/tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz"
 RUN ln -fs /opt/julia-*/bin/julia /usr/local/bin/julia
@@ -32,10 +31,13 @@ RUN mkdir /etc/julia && \
 # Install IJulia as jovyan and then move the kernelspec out
 # to the system share location. Avoids problems with runtime UID change not
 # taking effect properly on the .local folder in the jovyan home dir.
+USER $NB_UID
 RUN julia -e 'import Pkg; Pkg.update()' && \
-    julia -e "using Pkg; pkg\"add IJulia\"; pkg\"precompile\"" && \
+    julia -e "using Pkg; pkg\"add IJulia\"; pkg\"precompile\""
+
+USER root
     # move kernelspec out of home \
-    mv "${HOME}/.local/share/jupyter/kernels/julia"* "${CONDA_DIR}/share/jupyter/kernels/" && \
+RUN mv "${HOME}/.local/share/jupyter/kernels/julia"* "${CONDA_DIR}/share/jupyter/kernels/" && \
     chmod -R go+rx "${CONDA_DIR}/share/jupyter" && \
     rm -rf "${HOME}/.local" && \
     fix-permissions "${JULIA_PKGDIR}" "${CONDA_DIR}/share/jupyter"

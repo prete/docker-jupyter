@@ -4,7 +4,7 @@ USER root
 
 # general OS packages
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    htop vim unzip git wget tmux \
+    htop vim unzip git wget tmux nano \
     # sshfs dependencies
     fuse libfuse2 sshfs \
     # build dependencies for singularity

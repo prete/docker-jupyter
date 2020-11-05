@@ -1,0 +1,16 @@
+using Pkg;
+Pkg.add("Gadfly");
+Pkg.add("RDatasets");
+Pkg.add("Distances");
+Pkg.add("StatsBase");
+Pkg.add("Hadamard");
+Pkg.add("JLD");
+Pkg.add("StatsBase");
+Pkg.add("Statistics");
+Pkg.add("Embeddings");
+Pkg.add("DataFrames");
+Pkg.add("GLM");
+Pkg.add("LsqFit");
+Pkg.add("Combinatorics");
+Pkg.add("Cairo");
+Pkg.precompile();
