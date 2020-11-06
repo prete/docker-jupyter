@@ -9,7 +9,7 @@ DOCKER_BUILDKIT=1
 function build {
     echo "🐳 building '$IMAGE' image with tag '$TAG'"
     cd $DOCKERFILE_ROOT_DIR/$IMAGE
-    docker build --build-arg tag_name=$TAG --tag "$REGISTRY:$IMAGE-$TAG" .
+    docker build --quiet --build-arg tag_name=$TAG --tag "$REGISTRY:$IMAGE-$TAG" .
     BUILD_RESULT=$?
     if [ $BUILD_RESULT -eq 0 ]; then
         echo -e "✅ $IMAGE build successfully!"  

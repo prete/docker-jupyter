@@ -36,6 +36,9 @@ USER $NB_UID
 COPY install.jl /tmp/install.jl
 RUN julia -e "include(\"/tmp/install.jl\");"
 
+# clean conda cache
+RUN  mamba clean --index-cache --tarballs --yes
+
 # move kernelspec out of home to the system share location \
 USER root
 RUN mv "${HOME}/.local/share/jupyter/kernels/julia"* "${CONDA_DIR}/share/jupyter/kernels/" && \

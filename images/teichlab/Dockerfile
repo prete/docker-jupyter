@@ -25,6 +25,9 @@ ENV PATH /opt/conda/envs/teichlab/bin:/opt/conda/bin:$PATH
 RUN Rscript -e 'install.packages(c("vcfR","car","ggpubr","SoupX"));'
 RUN Rscript -e 'devtools::install_github(c("velocyto-team/velocyto.R", "im3sanger/dndscv"))'
 
+# clean conda cache
+RUN  mamba clean --index-cache --tarballs --yes
+
 # Fix permissions
 RUN fix-permissions $CONDA_DIR && \
     fix-permissions /usr/lib/R/ && \

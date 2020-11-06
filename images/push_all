@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [ -z "$1" ]; then
+  echo "No tag  argument supplied"
+  exit
+fi
+
+DOCKERFILE_ROOT_DIR=/home/ubuntu/docker-jupyter/images
+REGISTRY=quay.io/prete/docker-jupyter
+TAG=$1
+
+for IMAGE in $(ls -l $DOCKERFILE_ROOT_DIR | grep '^d' | awk '{print $9}')
+    docker push "$REGISTRY:$IMAGE-$TAG"
+done
+
+

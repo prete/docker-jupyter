@@ -64,6 +64,9 @@ RUN Rscript -e 'install.packages(c("IRkernel", "Rmagic", "BiocManager", "devtool
 RUN Rscript -e 'IRkernel::installspec(prefix="/opt/conda")'
 RUN Rscript -e 'BiocManager::install()'
 
+# clean conda cache
+RUN  mamba clean --index-cache --tarballs --yes
+
 # fix permissions
 RUN fix-permissions /opt/conda/share/jupyter/kernels/ && \
     fix-permissions /usr/lib/R/ && \

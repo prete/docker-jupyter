@@ -20,6 +20,8 @@ RUN Rscript -e 'BiocManager::install(c("SummarizedExperiment", "SingleCellExperi
 
 RUN Rscript -e 'devtools::install_github(c("cellgeni/sceasy", "mojaveazure/loomR", "immunogenomics/harmony", "cole-trapnell-lab/leidenbase", "cole-trapnell-lab/monocle3"));'
 
+# clean conda cache
+RUN  mamba clean --index-cache --tarballs --yes
 
 # fix permissions
 RUN fix-permissions /usr/lib/R/ && \
