@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+#Settings
+DOCKERFILE_ROOT_DIR=/home/ubuntu/docker-jupyter/images
+REGISTRY=quay.io/prete/docker-jupyter
+DOCKER_BUILDKIT=1
+
+#Build docker image
+function build {
+    echo "🐳 building '$IMAGE' image with tag '$TAG'"
+    cd $DOCKERFILE_ROOT_DIR/$IMAGE
+    docker build --build-arg tag_name=$TAG --tag "$REGISTRY:$IMAGE-$TAG" .
+    BUILD_RESULT=$?
+    if [ $BUILD_RESULT -eq 0 ]; then
+        echo -e "✅ $IMAGE build successfully!"  
+    else
+        echo -e "❌ $IMAGE build failed!"
+    fi
+    
+}
+
+#Generate tag
+TAG="$(date '+%s')"
+echo "🏷️ Using tag $TAG"
+
+#Build for each image folder
+for IMAGE in $(ls -l $DOCKERFILE_ROOT_DIR | grep '^d' | awk '{print $9}')
+do
+    echo "----------------------"
+    build
+    echo "----------------------"
+done
+

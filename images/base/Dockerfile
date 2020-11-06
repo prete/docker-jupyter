@@ -1,3 +1,5 @@
+ARG tag_name
+
 FROM jupyter/base-notebook
 
 USER root
@@ -70,5 +72,7 @@ RUN sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoe
 COPY mount-farm /usr/local/bin/mount-farm
 RUN chmod +x /usr/local/bin/mount-farm
 
+RUN mkdir -p /sanger && \
+    echo "base-${tag_name}" > /sanger/image.info
 
 COPY poststart.sh /poststart/base.sh

@@ -1,4 +1,8 @@
-FROM quay.io/prete/docker-jupyter:r-base
+ARG tag_name
+ARG parent_image="r-base"
+ARG registry="quay.io/prete/docker-jupyter"
+
+FROM ${registry}:${parent_image}-${tag_name}
 
 USER root
 
@@ -21,5 +25,6 @@ RUN Rscript -e 'devtools::install_github(c("cellgeni/sceasy", "mojaveazure/loomR
 RUN fix-permissions /usr/lib/R/ && \
     fix-permissions /usr/local/lib/R/site-library
 
+RUN echo "r-full-${tag_name}" >> /sanger/image.info
 
 COPY poststart.sh /poststart/r.sh

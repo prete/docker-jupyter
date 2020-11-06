@@ -1,7 +1,10 @@
-FROM quay.io/prete/docker-jupyter:base
+ARG tag_name
+ARG parent_image="base"
+ARG registry="quay.io/prete/docker-jupyter"
+
+FROM ${registry}:${parent_image}-${tag_name}
 
 ARG rstudio_version="1.2.5019"
-
 
 USER root
 
@@ -65,5 +68,7 @@ RUN Rscript -e 'BiocManager::install()'
 RUN fix-permissions /opt/conda/share/jupyter/kernels/ && \
     fix-permissions /usr/lib/R/ && \
     fix-permissions /usr/local/lib/R/site-library
+
+RUN echo "r-base-${tag_name}" >> /sanger/image.info
 
 COPY poststart.sh /poststart/r.sh
