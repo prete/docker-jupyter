@@ -52,3 +52,29 @@ At the moment by default every user is given 50GB (guaranteed) to 200GB (maximum
 - **JupyterHub environment and storage are not backed up**
 - **Keep your notebooks light**. Notebooks over 100MB will give you unexpected errors.
 
+### Image hierarchy diagram
+```
+           +------+
+           | base |
+           +------+
+               +
+               |
+      +--------+-----------+
+      |        |           | 
+      V        V           V
+  +-------+  +-------+  +-------+
+  | julia |  | python|  |r-base |
+  +-------+  +-------+  +-------+
+                           +
+                           |
+                           V
+                        +-------+
+                        |r-full |
+                        +-------+
+                           +
+                           |
+                           V
+                        +--------+
+                        |teichlab|
+                        +--------+
+```

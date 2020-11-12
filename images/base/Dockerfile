@@ -6,9 +6,11 @@ USER root
 
 # general OS packages
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    htop vim unzip git wget tmux nano \
+    # basic packages 
+    htop vim emacs unzip git wget axel tmux nano rsync  \
+    sshpass \
     # sshfs dependencies
-    fuse libfuse2 sshfs \
+    fuse libfuse2 sshfs s3fs \
     # build dependencies for singularity
     build-essential uuid-dev libgpgme-dev squashfs-tools libseccomp-dev \
     pkg-config gcc g++ cryptsetup-bin \
@@ -20,7 +22,6 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 # conda packages
 RUN conda install -c conda-forge mamba
 RUN mamba install -y \
-      nb_conda_kernels \
       jupyter-server-proxy \
       nbresuse \ 
       qtconsole \
@@ -39,7 +40,7 @@ RUN  mamba clean --index-cache --tarballs --yes
 
 # fix permissions
 RUN fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER 
+    fix-permissions /home/$NB_USER
 
 # rclone
 RUN RCLONE_DEB=rclone-current-linux-amd64.deb && \
@@ -67,7 +68,6 @@ RUN export VERSION=3.6.1 && \
     ./mconfig && make -C builddir && make -C builddir install && \
     rm -rf /tmp/singularity/
 
-
 # give jovyan sudo permissions
 RUN sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoers && \
     echo "jovyan ALL= (ALL) NOPASSWD: ALL" >> /etc/sudoers.d/jovyan
@@ -76,7 +76,8 @@ RUN sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoe
 COPY mount-farm /usr/local/bin/mount-farm
 RUN chmod +x /usr/local/bin/mount-farm
 
+ENV TAG_NAME="base-$tag_name"
 RUN mkdir -p /sanger && \
-    echo "base-${tag_name}" > /sanger/image.info
+    echo "$TAG_NAME" > /sanger/image.info
 
 COPY poststart.sh /poststart/base.sh

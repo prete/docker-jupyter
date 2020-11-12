@@ -1,5 +1,5 @@
 ARG tag_name
-ARG parent_image="base"
+ARG parent_image="r-full"
 ARG registry="quay.io/prete/docker-jupyter"
 
 FROM ${registry}:${parent_image}-${tag_name}
@@ -22,7 +22,7 @@ RUN  mamba clean --index-cache --tarballs --yes
 # fix permissions
 RUN fix-permissions $CONDA_DIR
 
-ENV TAG_NAME="python-$tag_name"
+ENV TAG_NAME="py-r-full-$tag_name"
 RUN echo "$TAG_NAME" > /sanger/image.info
 
-COPY poststart.sh /poststart/python.sh
+COPY poststart.sh /poststart/py-r-full.sh

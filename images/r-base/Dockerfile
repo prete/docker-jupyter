@@ -56,7 +56,6 @@ RUN pip install --upgrade --no-cache \
 
 # Use this URL to work with the binary packages available 
 # https://packagemanager.rstudio.com/client/#/repos/1/overview
-RUN echo 'local({ options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/__linux__/focal/latest")) })' > $R_HOME/etc/Rprofile.site
 RUN echo 'options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/__linux__/focal/latest"))' > ~/.Rprofile
 
 ## R packages
@@ -72,6 +71,7 @@ RUN fix-permissions /opt/conda/share/jupyter/kernels/ && \
     fix-permissions /usr/lib/R/ && \
     fix-permissions /usr/local/lib/R/site-library
 
-RUN echo "r-base-${tag_name}" >> /sanger/image.info
+ENV TAG_NAME="r-base-$tag_name"
+RUN echo "$TAG_NAME" >> /sanger/image.info
 
-COPY poststart.sh /poststart/r.sh
+COPY poststart.sh /poststart/r-base.sh

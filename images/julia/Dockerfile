@@ -46,6 +46,7 @@ RUN mv "${HOME}/.local/share/jupyter/kernels/julia"* "${CONDA_DIR}/share/jupyter
     rm -rf "${HOME}/.local" && \
     fix-permissions "${JULIA_PKGDIR}" "${CONDA_DIR}/share/jupyter"
 
-RUN echo "julia-${tag_name}" >> /sanger/image.info
+ENV TAG_NAME="julia-$tag_name"
+RUN echo "$TAG_NAME" >> /sanger/image.info
 
 COPY poststart.sh /poststart/julia.sh

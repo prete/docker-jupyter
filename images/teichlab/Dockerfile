@@ -17,9 +17,7 @@ RUN apt-get clean && \
 
 # conda packages
 COPY environment.yml /tmp/environment.yml
-RUN mamba env create  --file /tmp/environment.yml 
-#    && /opt/conda/condabin/conda clean --all --yes --quiet
-ENV PATH /opt/conda/envs/teichlab/bin:/opt/conda/bin:$PATH
+RUN mamba env update --file /tmp/environment.yml
 
 # R packages
 RUN Rscript -e 'install.packages(c("vcfR","car","ggpubr","SoupX"));'
@@ -33,7 +31,8 @@ RUN fix-permissions $CONDA_DIR && \
     fix-permissions /usr/lib/R/ && \
     fix-permissions /usr/local/lib/R/site-library
 
-RUN echo "teichlab-${tag_name}" >> /sanger/image.info
+ENV TAG_NAME="teichlab-$tag_name"
+RUN echo "$TAG_NAME" >> /sanger/image.info
 
 COPY poststart.sh /poststart/teichlab.sh
 

@@ -27,6 +27,7 @@ RUN  mamba clean --index-cache --tarballs --yes
 RUN fix-permissions /usr/lib/R/ && \
     fix-permissions /usr/local/lib/R/site-library
 
-RUN echo "r-full-${tag_name}" >> /sanger/image.info
+ENV TAG_NAME="r-full-$tag_name"
+RUN echo "$TAG_NAME" >> /sanger/image.info
 
-COPY poststart.sh /poststart/r.sh
+COPY poststart.sh /poststart/r-full.sh

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 if [ -z "$1" ]; then
-  echo "No tag  argument supplied"
+  echo "No tag argument supplied."
+  echo " ./push_all <TAG>"
   exit
 fi
 
@@ -9,8 +10,11 @@ DOCKERFILE_ROOT_DIR=/home/ubuntu/docker-jupyter/images
 REGISTRY=quay.io/prete/docker-jupyter
 TAG=$1
 
-for IMAGE in $(ls -l $DOCKERFILE_ROOT_DIR | grep '^d' | awk '{print $9}')
-    docker push "$REGISTRY:$IMAGE-$TAG"
-done
+mkdir -p "$DOCKERFILE_ROOT_DIR/logs"
 
+for IMAGE in $(cat $DOCKERFILE_ROOT_DIR/build_list.txt)
+do
+    echo "Pushing 📡  $REGISTRY:$IMAGE-$TAG"  | ts '[%Y-%m-%d %H:%M:%S]' 
+    docker push "$REGISTRY:$IMAGE-$TAG"  | ts '[%Y-%m-%d %H:%M:%S]' > "$DOCKERFILE_ROOT_DIR/logs/$IMAGE-$TAG.push.log"
+done
 

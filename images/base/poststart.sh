@@ -1,5 +1,26 @@
 #!/usr/bin/env bash
 
+# copy example notebooks
+TMP_NOTEBOOKS=/tmp/example-notebooks.zip
+wget --quiet -O $TMP_NOTEBOOKS https://github.com/cellgeni/notebooks/archive/master.zip 
+unzip $TMP_NOTEBOOKS -d /tmp
+rm /tmp/notebooks-master/.gitignore /tmp/notebooks-master/LICENSE /tmp/notebooks-master/README.md
+cp -Rf /tmp/notebooks-master/. .
+rm -rf $TMP_NOTEBOOKS /tmp/notebooks-master/
+
+#conda config file
+cat > /home/jovyan/.condarc <<EOF
+env_prompt: ({name})
+channels:
+  - conda-forge
+  - bioconda
+envs_dirs:
+  - /home/jovyan/conda-envs/
+create_default_packages:
+  - pip
+  - ipykernel
+EOF
+
 # create matching folders to mount the farm
 if [ ! -d /nfs ] || [ ! -d /lustre ] || [ ! -d /warehouse ]; then
     sudo mkdir -p /nfs
