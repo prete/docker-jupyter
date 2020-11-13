@@ -1,11 +1,13 @@
 using Pkg;
 Pkg.update();
 Pkg.add("IJulia");
+Pkg.add("CSV");
 Pkg.add("Gadfly");
 Pkg.add("RDatasets");
 Pkg.add("Distances");
 Pkg.add("StatsBase");
 Pkg.add("Hadamard");
+Pkg.add("HDF5");
 Pkg.add("JLD");
 Pkg.add("StatsBase");
 Pkg.add("Statistics");

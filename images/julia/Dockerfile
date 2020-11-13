@@ -4,6 +4,8 @@ ARG registry="quay.io/prete/docker-jupyter"
 
 FROM ${registry}:${parent_image}-${tag_name}
 
+ARG tag_name
+ARG image_name="julia"
 ARG julia_version="1.5.2"
 
 USER root
@@ -46,7 +48,8 @@ RUN mv "${HOME}/.local/share/jupyter/kernels/julia"* "${CONDA_DIR}/share/jupyter
     rm -rf "${HOME}/.local" && \
     fix-permissions "${JULIA_PKGDIR}" "${CONDA_DIR}/share/jupyter"
 
-ENV TAG_NAME="julia-$tag_name"
-RUN echo "$TAG_NAME" >> /sanger/image.info
+RUN conda list > /sanger/conda.info && \
+    julia --version > /sanger/julia.info && \
+    echo "$image_name-$tag_name" >> /sanger/image.info
 
 COPY poststart.sh /poststart/julia.sh

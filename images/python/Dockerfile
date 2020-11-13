@@ -4,13 +4,14 @@ ARG registry="quay.io/prete/docker-jupyter"
 
 FROM ${registry}:${parent_image}-${tag_name}
 
+ARG tag_name
+ARG image_name="python"
+
 USER root
 
 # general OS packages
-RUN apt-get update -y -qq
-# && apt-get install -yq --no-install-recommends \
-#    apt-get clean && \
-#    rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y -qq && \
+    apt-get clean
 
 # conda packages
 COPY environment.yml /tmp/environment.yml
@@ -22,7 +23,8 @@ RUN  mamba clean --index-cache --tarballs --yes
 # fix permissions
 RUN fix-permissions $CONDA_DIR
 
-ENV TAG_NAME="python-$tag_name"
-RUN echo "$TAG_NAME" > /sanger/image.info
+RUN echo "$image_name-$tag_name" > /sanger/image.info
+
+RUN conda list > /sanger/description/conda.txt
 
 COPY poststart.sh /poststart/python.sh

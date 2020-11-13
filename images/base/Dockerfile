@@ -1,14 +1,16 @@
-ARG tag_name
-
 FROM jupyter/base-notebook
 
+ARG tag_name
+ARG image_name="base"
+
 USER root
+
 
 # general OS packages
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     # basic packages 
     htop vim emacs unzip git wget axel tmux nano rsync  \
-    sshpass \
+    sshpass lsb-release \
     # sshfs dependencies
     fuse libfuse2 sshfs s3fs \
     # build dependencies for singularity
@@ -29,14 +31,10 @@ RUN mamba install -y \
       ipykernel \
       -c conda-forge
 
-#RUN jupyter serverextension enable --sys-prefix jupyter_server_proxy 
 RUN jupyter labextension install @jupyterlab/server-proxy
 
 # clean conda cache
 RUN  mamba clean --index-cache --tarballs --yes
-
-# && \
-#    jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 # fix permissions
 RUN fix-permissions $CONDA_DIR && \
@@ -76,8 +74,11 @@ RUN sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoe
 COPY mount-farm /usr/local/bin/mount-farm
 RUN chmod +x /usr/local/bin/mount-farm
 
-ENV TAG_NAME="base-$tag_name"
-RUN mkdir -p /sanger && \
-    echo "$TAG_NAME" > /sanger/image.info
+RUN mkdir -p /sanger/ && \
+    conda list > /sanger/conda.info && \
+    lsb_release -a > /sanger/ubuntu.info && \
+    singularity --version > /sanger/singularity.info && \
+    rclone --version > /sanger/rclone.info && \
+    echo "$image_name-$tag_name" > /sanger/image.info
 
 COPY poststart.sh /poststart/base.sh

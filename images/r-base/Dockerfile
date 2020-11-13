@@ -4,6 +4,8 @@ ARG registry="quay.io/prete/docker-jupyter"
 
 FROM ${registry}:${parent_image}-${tag_name}
 
+ARG tag_name
+ARG image_name="r-base"
 ARG rstudio_version="1.2.5019"
 
 USER root
@@ -71,7 +73,8 @@ RUN fix-permissions /opt/conda/share/jupyter/kernels/ && \
     fix-permissions /usr/lib/R/ && \
     fix-permissions /usr/local/lib/R/site-library
 
-ENV TAG_NAME="r-base-$tag_name"
-RUN echo "$TAG_NAME" >> /sanger/image.info
+RUN R --version > /sanger/r.info && \
+    echo "$rstudio_version" > /sanger/rstudio.info && \
+    echo "$image_name-$tag_name" >> /sanger/image.info
 
 COPY poststart.sh /poststart/r-base.sh
