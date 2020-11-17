@@ -31,6 +31,324 @@ We support a Jupyter Hub server running on Sanger Cloud. Jupyter allows you to r
                                       +----------+
 ```
 
+
+## Image content
+
+  - [base](#base) base image, contains the minimum to launch notebooks
+  - [python](#python) python image, contains most popular packages for python
+  - [julia](#julia) julia image, contains most popular julia packages for julia
+  - [r-base](#r-base) R base image, contains R language kernel and R Studio with minimum packages
+  - [r-full](#r-full) R full image, contains most popular R packages for R
+  - [py-r-full](#py-r-full) Python and R full image, contains most popular packages for both Python and R.
+  - [teichlab](#teichlab) custom image containing the Teichmann lab requirments
+
+### base
+
+- Operating system: Ubuntu focal 20.04.1 LTS
+- Additional packages:
+  - rclone v1.53.2
+  - go v1.15.3
+  - singularity v3.6.1
+- Python v3.8.6
+
+### python
+
+- Operating system: Ubuntu focal 20.04.1 LTS
+- Additional packages:
+  - rclone v1.53.2
+  - go v1.15.3
+  - singularity v3.6.1
+- Python v3.8.6
+- Python packages:
+  - cython
+  - cmake
+  - numpy
+  - python-igraph
+  - pandas
+  - louvain
+  - leidenalg
+  - scanpy
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - sccaf
+  - plotly
+  - scvi-tools
+  - bbknn
+  - h5py
+  - scvelo
+  - scirpy
+  - palantir
+  - velocyto
+  - pyscenic
+
+### julia
+- Operating system: Ubuntu focal 20.04.1 LTS
+- Additional packages:
+  - rclone v1.53.2
+  - go v1.15.3
+  - singularity v3.6.1
+- Python v3.8.6
+- Julia v1.5.2
+- Julia packages:
+  - IJulia
+  - CSV
+  - Gadfly
+  - RDatasets
+  - Distances
+  - StatsBase
+  - Hadamard
+  - HDF5
+  - JLD
+  - StatsBase
+  - Statistics
+  - Embeddings
+  - DataFrames
+  - GLM
+  - LsqFit
+  - Combinatorics
+  - Cairo
+
+### r-base
+- Additional packages:
+  - rclone v1.53.2
+  - go v1.15.3
+  - singularity v3.6.1
+- Python v3.8.6
+- Python packages:
+  - rpy2
+- R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
+- RStudio version 1.2.5019
+- R packages:
+  - IRkernel
+  - Rmagic
+  - BiocManager
+  - devtools
+
+### r-full
+- Operating system: Ubuntu focal 20.04.1 LTS
+- Additional packages:
+  - rclone v1.53.2
+  - go v1.15.3
+  - singularity v3.6.1
+- Python v3.8.6
+- Python packages:
+  - rpy2
+- R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
+- RStudio version 1.2.5019
+- R packages:
+  - IRkernel
+  - Rmagic
+  - BiocManager
+  - devtools
+  - tidyverse
+  - rJava
+  - umap
+  - ggplot2
+  - ggfortify
+  - igraph
+  - lsa
+  - uwot
+  - optparse
+  - Seurat
+  - SummarizedExperiment
+  - SingleCellExperiment
+  - DropletUtils
+  - LoomExperiment
+  - Rhdf5lib
+  - scater
+  - scran
+  - RUVSeq
+  - sva
+  - MultiAssayExperiment
+  - batchelor
+  - edgeR
+  - DESeq2
+  - BiocParallel
+  - SC3
+  - destiny
+  - pcaMethods
+  - zinbwave
+  - GenomicAlignments
+  - M3Drop
+  - switchde
+  - biomaRt
+  - Matrix.utils
+  - cellgeni/sceasy
+  - mojaveazure/loomR
+  - immunogenomics/harmony
+  - cole-trapnell-lab/leidenbase
+  - cole-trapnell-lab/monocle3
+
+### py-r-full
+- Operating system: Ubuntu focal 20.04.1 LTS
+- Additional packages:
+  - rclone v1.53.2
+  - go v1.15.3
+  - singularity v3.6.1
+  - samtools
+  - bcftools
+  - bedtools
+  - parallel
+- Python v3.8.6
+- Python packages:
+  - cython
+  - cmake
+  - numpy
+  - python-igraph
+  - pandas
+  - louvain
+  - leidenalg
+  - scanpy
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - sccaf
+  - plotly
+  - scvi-tools
+  - bbknn
+  - h5py
+  - scvelo
+  - scirpy
+  - palantir
+  - velocyto
+  - pyscenic
+  - rpy2
+- R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
+- RStudio version 1.2.5019
+- R packages:
+  - IRkernel
+  - Rmagic
+  - BiocManager
+  - devtools
+  - tidyverse
+  - rJava
+  - umap
+  - ggplot2
+  - ggfortify
+  - igraph
+  - lsa
+  - uwot
+  - optparse
+  - Seurat
+  - SummarizedExperiment
+  - SingleCellExperiment
+  - DropletUtils
+  - LoomExperiment
+  - Rhdf5lib
+  - scater
+  - scran
+  - RUVSeq
+  - sva
+  - MultiAssayExperiment
+  - batchelor
+  - edgeR
+  - DESeq2
+  - BiocParallel
+  - SC3
+  - destiny
+  - pcaMethods
+  - zinbwave
+  - GenomicAlignments
+  - M3Drop
+  - switchde
+  - biomaRt
+  - Matrix.utils
+  - cellgeni/sceasy
+  - mojaveazure/loomR
+  - immunogenomics/harmony
+  - cole-trapnell-lab/leidenbase
+  - cole-trapnell-lab/monocle3
+
+
+### teichlab
+- Operating system: Ubuntu focal 20.04.1 LTS
+- Additional packages:
+  - rclone v1.53.2
+  - go v1.15.3
+  - singularity v3.6.1
+- Python v3.8.6
+- Python packages:
+  - numpy
+  - cython
+  - python-igraph
+  - pandas
+  - louvain
+  - leidenalg
+  - gpy  
+  - scanpy
+  - scikit-learn
+  - matplotlib
+  - snakemake
+  - cmake
+  - sccaf
+  - pytest
+  - plotly
+  - ggplot
+  - scvi-tools
+  - bbknn
+  - h5py
+  - velocyto
+  - spatialde
+  - scvelo
+  - wot
+  - cellphonedb
+  - pyscenic
+  - scirpy
+  - palantir
+  - rpy2
+- R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
+- RStudio version 1.2.5019
+- R packages:
+  - IRkernel
+  - Rmagic
+  - BiocManager
+  - devtools
+  - tidyverse
+  - rJava
+  - umap
+  - ggplot2
+  - ggfortify
+  - igraph
+  - lsa
+  - uwot
+  - optparse
+  - Seurat
+  - SummarizedExperiment
+  - SingleCellExperiment
+  - DropletUtils
+  - LoomExperiment
+  - Rhdf5lib
+  - scater
+  - scran
+  - RUVSeq
+  - sva
+  - MultiAssayExperiment
+  - batchelor
+  - edgeR
+  - DESeq2
+  - BiocParallel
+  - SC3
+  - destiny
+  - pcaMethods
+  - zinbwave
+  - GenomicAlignments
+  - M3Drop
+  - switchde
+  - biomaRt
+  - Matrix.utils
+  - cellgeni/sceasy
+  - mojaveazure/loomR
+  - immunogenomics/harmony
+  - cole-trapnell-lab/leidenbase
+  - cole-trapnell-lab/monocle3
+  - vcfR
+  - car
+  - ggpubr
+  - SoupX
+  - velocyto-team/velocyto.R
+  - im3sanger/dndscv
+
 ### Build order
 1. [base](images/base/)
 2. [julia](images/julia/)
