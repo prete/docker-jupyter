@@ -4,6 +4,9 @@ ARG registry="quay.io/prete/docker-jupyter"
 
 FROM ${registry}:${parent_image}-${tag_name}
 
+ARG tag_name
+ARG image_name="r-full"
+
 USER root
 
 # general OS packages
@@ -27,7 +30,9 @@ RUN  mamba clean --index-cache --tarballs --yes
 RUN fix-permissions /usr/lib/R/ && \
     fix-permissions /usr/local/lib/R/site-library
 
-ENV TAG_NAME="r-full-$tag_name"
-RUN echo "$TAG_NAME" >> /sanger/image.info
+RUN echo "$image_name=$tag_name" >> /sanger/image.info && \ 
+    conda list > /sanger/conda.info && \
+    Rscript -e "as.data.frame(installed.packages()[,c(1,3:4)])[,1:2,drop=FALSE]" > /sanger/r-packages.info
+
 
 COPY poststart.sh /poststart/r-full.sh

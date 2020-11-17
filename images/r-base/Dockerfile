@@ -74,6 +74,8 @@ RUN fix-permissions /opt/conda/share/jupyter/kernels/ && \
     fix-permissions /usr/local/lib/R/site-library
 
 RUN R --version > /sanger/r.info && \
+    Rscript -e "as.data.frame(installed.packages()[,c(1,3:4)])[,1:2,drop=FALSE]" > /sanger/r-packages.info && \
+    conda list > /sanger/conda.info && \
     echo "$rstudio_version" > /sanger/rstudio.info && \
     echo "$image_name-$tag_name" >> /sanger/image.info
 

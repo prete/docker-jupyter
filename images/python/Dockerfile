@@ -23,8 +23,7 @@ RUN  mamba clean --index-cache --tarballs --yes
 # fix permissions
 RUN fix-permissions $CONDA_DIR
 
-RUN echo "$image_name-$tag_name" > /sanger/image.info
-
-RUN conda list > /sanger/description/conda.txt
+RUN echo "$image_name-$tag_name" > /sanger/image.info && \
+    conda list > /sanger/conda.info
 
 COPY poststart.sh /poststart/python.sh
