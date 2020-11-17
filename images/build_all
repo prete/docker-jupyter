@@ -3,14 +3,14 @@
 #Settings
 DOCKERFILE_ROOT_DIR=/home/ubuntu/docker-jupyter/images
 REGISTRY=quay.io/prete/docker-jupyter
-BUILD_LOG_DIR=$DOCKERFILE_ROOT_DIR/build_logs/
-mkdir -p $DOCKERFILE_ROOT_DIR/logs
+LOG_DIR=$DOCKERFILE_ROOT_DIR/logs/
+mkdir -p $LOG_DIR
 
 #Build docker image
 function build {
     echo "🐳 building '$IMAGE' image with tag '$TAG'"  | ts '[%Y-%m-%d %H:%M:%S]'
     cd $DOCKERFILE_ROOT_DIR/$IMAGE
-    docker build --build-arg tag_name=$TAG --tag "$REGISTRY:$IMAGE-$TAG" . >  "$BUILD_LOG_DIR/$IMAGE-$TAG.log" | ts '[%Y-%m-%d %H:%M:%S]'
+    docker build --build-arg tag_name=$TAG --tag "$REGISTRY:$IMAGE-$TAG" . >  "$LOG_DIR/$IMAGE-$TAG.build.log" | ts '[%Y-%m-%d %H:%M:%S]'
     BUILD_RESULT=$?
     if [ $BUILD_RESULT -eq 0 ]; then
         echo -e "✅ $IMAGE build successfully!" | ts '[%Y-%m-%d %H:%M:%S]'  
